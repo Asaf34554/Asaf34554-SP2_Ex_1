@@ -5,15 +5,15 @@
 #include "player.hpp"
 #include "card.hpp"
 #include <vector>
+#include <queue>
 
 
 
 namespace ariel
 {
     class Game {
-        Player p1,p2;
-        // Card* cards;
-        vector<Card> cards;
+        Player *p1,*p2;
+        queue<string> string_turns;
         bool check ;
 
     public:
@@ -25,12 +25,11 @@ namespace ariel
         void printWiner(); // outline method
         void printLog(); // outline method
         void printStats(); // outline method
-        // Card* make_deck(); //outline method
-        vector<Card> make_deck();
+        void make_deck(); //outline method
 
         // // Constructors:
         Game();
-        Game(Player p_1,Player p_2);
+        Game(Player &p_1,Player &p_2);
         // ~Game();
 
     };

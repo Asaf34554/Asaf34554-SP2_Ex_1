@@ -3,6 +3,8 @@
         "stdexcept": "cpp",
         "iosfwd": "cpp",
         "sstream": "cpp",
-        "deque": "cpp"
+        "deque": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp"
     }
 }

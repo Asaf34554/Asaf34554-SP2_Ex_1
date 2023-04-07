@@ -11,7 +11,6 @@ void Card:: set_Card_Value(int value){
 
 void Card:: set_Card_Type(string type){
     this->type = type;
-
 }
 
 void Card:: set_Card_Name(string name){

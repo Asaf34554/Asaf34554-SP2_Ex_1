@@ -5,6 +5,7 @@
         "sstream": "cpp",
         "deque": "cpp",
         "iostream": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "string": "cpp"
     }
 }

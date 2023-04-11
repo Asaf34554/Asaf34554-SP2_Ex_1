@@ -15,6 +15,7 @@ namespace ariel
         Player *p1,*p2;
         queue<string> string_turns;
         bool check ;
+        string last_turn;
 
     public:
         

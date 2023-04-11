@@ -21,11 +21,13 @@ namespace ariel
         int stacksize(){return cardsleft; } //inline method
         int cardesTaken(){return cardstaken; } // inline method
         std::string getName(){return name; } //inline method
-        void set_card_stack(Card card){cards.push(card);} //inline method
+        void set_card_stack(Card card){
+            cards.push(card);
+            ++cardsleft;} //inline method
         Card get_card(); //outline method
-        void set_stacksize(){cardsleft++;} //inline method
+        // void set_stacksize(){} //inline method
         void set_cardsTaken(int i){cardstaken +=i;} //inline method
-        void set_dec_stacksize(){cardsleft--;} //inline method
+        void set_dec_stacksize(){--cardsleft;} //inline method
         
         
         

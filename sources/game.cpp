@@ -17,8 +17,8 @@ Game::Game()
     this->p1_win_rate = 0;
     this->p2_win_rate =0;
     this->turn_num = 0;
-    p1 = (new Player("player1"));
-    p2 = (new Player("player2"));
+    p1->set_name("player1");
+    p2->set_name("player2");
     make_deck();
 }
 
@@ -178,8 +178,6 @@ void Game::make_deck(){
     // Making a Deck
     for (int i = 0; i < 4; i++){
         for (int j = 1; j < 14; j++){
-            
-            
             Card card;
             switch (i)
             {

@@ -33,6 +33,7 @@ namespace ariel
         void set_dec_stacksize(){--cardsleft;} //inline method
         void set_cards_won(const string &win_card){cards_won.push(win_card);}
         void print_cards_won();
+        void set_name(string pname); //outline method
 
         // Constructors:
         Player();

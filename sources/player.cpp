@@ -33,6 +33,10 @@ Card Player:: get_card(){
     return temp;
 }
 
+void Player:: set_name(string pname){
+    this->name = pname;
+}
+
 void Player:: print_cards_won(){
     while (!(this->cards_won.empty())){
         string s = cards_won.top();

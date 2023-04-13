@@ -1,53 +1,48 @@
 #include <iostream>
 #include <algorithm>
 #include <random>
-#include <thread>
+// #include <thread>
 #include <vector>
 
 #include "player.hpp"
 #include "card.hpp"
 #include "game.hpp"
 
-// methods
+
 using namespace ariel;
+
 Game::Game()
 {
+    this->draw_rate = 0;
+    this->p1_win_rate = 0;
+    this->p2_win_rate =0;
+    this->turn_num = 0;
     p1 = (new Player("player1"));
     p2 = (new Player("player2"));
     make_deck();
 }
+
 Game::Game(Player &p_1, Player &p_2)
 {
-    // if(&p_1 == &p_2)
-    // {
-    //     throw invalid_argument("cant start a game if the names of the players is the same.");
-    // }
-    
+    this->draw_rate = 0;
+    this->p1_win_rate = 0;
+    this->p2_win_rate =0;
+    this->turn_num = 0;
     this->p1 = &p_1;
     this->p2 = &p_2;
-    // if( &p1 == &p2)
-    // {
-    //     throw invalid_argument("cant start a game with the same player");
-    // }
     make_deck();
 }
 
-void Game::playTurn()
-{   
-    if(&p1 == &p2)
-    {
+void Game::playTurn(){   
+    if(&p1 == &p2){
         throw invalid_argument("cant start a game if the names of the players is the same.");
     }
-    if(p1->getName() == p2->getName())
-    {
+    if(p1->getName() == p2->getName()){
         throw invalid_argument("cant start a game if the names of the players is the same.");
     }
-    if (p1->stacksize() == 0)
-    {
+    if (p1->stacksize() == 0){
         throw runtime_error("the players deck is empty!");
     }
-    
-    
     Card p1card = p1->get_card();
     Card p2card = p2->get_card();
 
@@ -56,30 +51,31 @@ void Game::playTurn()
     p1draw.push_back(p1card);
     p2draw.push_back(p2card);
 
-
     string s = "";
     int count = 2;
-    while (true)
-    {
-        if (p1card.get_Card_Value() > p2card.get_Card_Value())
-        { // player 1 win
+    while (true){
+        count_turn();
+        if (p1card.get_Card_Value() > p2card.get_Card_Value()){ // player 1 win
             s += p1->getName() + " played " + p1card.get_Card_Name() + " of " + p1card.get_Card_Type() + " " + p2->getName() + " played " + p2card.get_Card_Name() + " of " + p2card.get_Card_Type() + ". " + p1->getName() + " wins.";
             p1->set_cardsTaken(count);
+            p1_set_won();
+            p1->set_cards_won(s);
             break;
         }
-        else if (p1card.get_Card_Value() < p2card.get_Card_Value())
-        { // player 2 win
+        else if (p1card.get_Card_Value() < p2card.get_Card_Value()){ // player 2 win
             s += p1->getName() + " played " + p1card.get_Card_Name() + " of " + p1card.get_Card_Type() + " " + p2->getName() + " played " + p2card.get_Card_Name() + " of " + p2card.get_Card_Type() + ". " + p2->getName() + " wins.";
             p2->set_cardsTaken(count);
+            p2_set_won();
+            p2->set_cards_won(s);
             break;
         }
-        else  // draw
-        { 
-                //when the deck of the players is not empty
-            if (p1card.get_Card_Value() == p2card.get_Card_Value() && (p1->stacksize() != 0 || p2->stacksize() != 0))
-            {
-                if (p1->stacksize() >= 2 && p2->stacksize() >= 2)
-                { // Draw and the have more then 1 card in the deck
+        else{ // draw
+
+            //when the deck of the players is not empty
+            set_draw();
+            if (p1card.get_Card_Value() == p2card.get_Card_Value() && (p1->stacksize() != 0 || p2->stacksize() != 0)){
+                if (p1->stacksize() >= 2 && p2->stacksize() >= 2){ 
+                    // Draw and the have more then 1 card in the deck
                     count += 4;
                     Card p1setcard = p1->get_card();
                     Card p2setcard = p2->get_card();
@@ -99,161 +95,158 @@ void Game::playTurn()
                     p2draw.push_back(p2card);
                 }
 
-            }
-            else{   // when the deck of the players is empty
-                
-
-                    //when the last card of the players has the same value
+            }  
+            // when the deck of the players is empty
+            else{ 
+                //when the last card of the players has the same value
                 if(p1card.get_Card_Value() == p2card.get_Card_Value() && p1->stacksize() == 0 && p2->stacksize() == 0){
                     p1->set_cardsTaken(1);
                     p2->set_cardsTaken(1);
                     return;
                 }
                 else{
-                        cout<<"shuffle the garbege"<<endl;
-                        cout<<"p1 card: "<< p1card.get_Card_Name()<<" ,and the deck size is: " << p1->stacksize()<<endl;
-                        cout<<"p2 card: "<< p1card.get_Card_Name()<<" ,and the deck size is: " << p2->stacksize() <<endl;
-
-                        shuffle(p1draw.begin(), p1draw.end(), mt19937(random_device()()));
-                        shuffle(p2draw.begin(), p2draw.end(), mt19937(random_device()()));
-                        for(const auto &card : p1draw){
-                            cout<<"the p1 for"<<endl;
-                            p1->set_card_stack(card);
-                        }
-                        for(const auto &card : p2draw){
-                            cout<<"the p2 for"<<endl;
-                            p2->set_card_stack(card);
-
-                        }
-                        cout<<"after suufle back"<<endl;
-                        p1card = p1->get_card();
-                        p2card = p2->get_card();
-                    
+                    shuffle(p1draw.begin(), p1draw.end(), mt19937(random_device()()));
+                    shuffle(p2draw.begin(), p2draw.end(), mt19937(random_device()()));
+                    for(const auto &card : p1draw){
+                        p1->set_card_stack(card);
+                    }
+                    for(const auto &card : p2draw){
+                        p2->set_card_stack(card);
+                    }
+                    p1card = p1->get_card();
+                    p2card = p2->get_card();
                 }
             }
         }
     }
-
-
     this->last_turn = s;
     this->string_turns.push(s);
 }
-void Game::printLastTurn()
-{
+
+void Game::printLastTurn(){
     cout << this->last_turn << endl;
 }
-void Game::playAll()
-{   
+
+void Game::playAll(){   
     while (p1->stacksize() > 0 && p2->stacksize() > 0)
     {
         playTurn();
     }
 }
-void Game::printWiner()
-{
-    if (p1->cardesTaken() > p2->cardesTaken())
-    {
-        cout << "And the winner is ...." << p1->getName() << "!!! (:"
-             << " he/she won " << p1->cardesTaken() << ". the loser is : " << p2->getName() << ". and he won : " << p2->cardesTaken() << endl;
+
+void Game::printWiner(){
+    if (p1->cardesTaken() > p2->cardesTaken()){
+        cout << "And the winner is ...." << p1->getName() << "!!! (:"<<endl;  
     }
-    else if (p1->cardesTaken() < p2->cardesTaken())
-    {
-        cout << "And the winner is ...." << p2->getName() << "!!! (:"
-             << " he/she won " << p2->cardesTaken() << ". the loser is : " << p1->getName() << ". and he won : " << p1->cardesTaken() << endl;
+    else if (p1->cardesTaken() < p2->cardesTaken()){
+        cout << "And the winner is ...." << p2->getName() << "!!! (:" << endl;
     }
-    else
-    {
+    else{
         cout << "We Have a draw." << endl;
     }
 }
-void Game::printLog()
-{
-    int i = 0;
-    while (!(this->string_turns.empty()))
-    {
+
+void Game::printLog(){
+    while (!(this->string_turns.empty())){
         string s = string_turns.front();
         cout << s << endl;
         string_turns.pop();
     }
 }
-void Game::printStats()
-{
+
+void Game::printStats(){
+    cout<<"\n\n Players Stats:  "<< endl;
+    cout<<"The number of TURNS is: " << get_turn_num()<<endl;
+    //p1 stats
+    cout<<"\n **********Player 1********** \nName: "<< p1->getName() << "."<<endl;
+    cout << "Number of cards he won: "<< p1->cardesTaken() << "."<<endl; 
+    cout<< "Number of turns he won: " << get_p1_stats() << ".\nWin rate: " << (get_p1_stats()*100)/get_turn_num() << "%."<<endl;
+    cout<< "Cards won: " <<endl;
+    p1->print_cards_won();
+    cout<< "Number of Draw Turn: " << get_draw_num() << "\n Draw rate: " << (get_draw_num()*100)/get_turn_num() <<"%."<<endl; 
+    //p2 stats
+    cout<<"\n **********Player 2********** \nName: "<< p2->getName() << "."<<endl;
+    cout<<"Number of cards he won: " << p2->cardesTaken()<<"."<<endl;
+    cout<< "Number of turns he won: " << get_p2_stats() <<".\nWin rate: " << (get_p2_stats() *100)/get_turn_num() << "%."<<endl;
+    cout<< "Cards won: " <<endl;
+    p2->print_cards_won();
+    cout<< "Number of Draw Turn: " << get_draw_num() << "\nDraw rate: " << (get_draw_num()*100)/get_turn_num() <<"%."<<endl; 
 }
-void Game::make_deck()
-{
+  
+void Game::make_deck(){
     vector<Card> deck;
     // Making a Deck
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 1; j < 14; j++)
-        {
+    for (int i = 0; i < 4; i++){
+        for (int j = 1; j < 14; j++){
+            
+            
             Card card;
             switch (i)
             {
-            case 0:
+                case 0:
                 card.set_Card_Type("Hearts");
                 break;
-            case 1:
+                case 1:
                 card.set_Card_Type("Diamonds");
                 break;
-            case 2:
+                case 2:
                 card.set_Card_Type("Clubs");
                 break;
-            case 3:
+                case 3:
                 card.set_Card_Type("Spades");
                 break;
             }
             switch (j)
             {
-            case 1:
+                case 1:
                 card.set_Card_Name("Ace");
                 card.set_Card_Value(j);
                 break;
-            case 2:
+                case 2:
                 card.set_Card_Name("2");
                 card.set_Card_Value(j);
                 break;
-            case 3:
+                case 3:
                 card.set_Card_Name("3");
                 card.set_Card_Value(j);
                 break;
-            case 4:
+                case 4:
                 card.set_Card_Name("4");
                 card.set_Card_Value(j);
                 break;
-            case 5:
+                case 5:
                 card.set_Card_Name("5");
                 card.set_Card_Value(j);
                 break;
-            case 6:
+                case 6:
                 card.set_Card_Name("6");
                 card.set_Card_Value(j);
                 break;
-            case 7:
+                case 7:
                 card.set_Card_Name("7");
                 card.set_Card_Value(j);
                 break;
-            case 8:
+                case 8:
                 card.set_Card_Name("8");
                 card.set_Card_Value(j);
                 break;
-            case 9:
+                case 9:
                 card.set_Card_Name("9");
                 card.set_Card_Value(j);
                 break;
-            case 10:
+                case 10:
                 card.set_Card_Name("10");
                 card.set_Card_Value(j);
                 break;
-            case 11:
+                case 11:
                 card.set_Card_Name("Jack");
                 card.set_Card_Value(j);
                 break;
-            case 12:
+                case 12:
                 card.set_Card_Name("Queen");
                 card.set_Card_Value(j);
                 break;
-            case 13:
+                case 13:
                 card.set_Card_Name("King");
                 card.set_Card_Value(j);
                 break;
@@ -261,31 +254,19 @@ void Game::make_deck()
             deck.push_back(card);
         }
     }
+
     // Shuffle the deck
     shuffle(deck.begin(), deck.end(), mt19937(random_device()()));
-
-    // Print the deck
-    //  for (const auto& card : deck) {
-    //      std::cout << "Card: " << card.get_Card_Name() << " of " << card.get_Card_Type() << ", value: " << card.get_Card_Value() << std::endl;
-    //  }
-    //  cout<<"size: "<< deck.size() <<endl;
-
     // Sending the Cards To the Players
     bool check = false;
-    for (const auto &card : deck)
-    {
-        if (check == false)
-        {
+    for (const auto &card : deck){
+        if (check == false){
             check = true;
             p1->set_card_stack(card);
-            // p1->set_stacksize();
         }
-        else
-        {
+        else{
             check = false;
             p2->set_card_stack(card);
-            // p2->set_stacksize();
         }
     }
-    cout << "p1 stacksize = " << p1->stacksize() << "  p2 stacksize = " << p2->stacksize() << endl;
 }

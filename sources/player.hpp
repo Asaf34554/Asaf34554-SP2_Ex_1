@@ -12,28 +12,37 @@ namespace ariel
         std::string name;
         int cardsleft;
         int cardstaken;
-        stack<Card> cards;        
+        stack<Card> cards;   
+        stack<string> cards_won;     
 
 
     public:
               
         //methods
-        int stacksize(){return cardsleft; } //inline method
-        int cardesTaken(){return cardstaken; } // inline method
-        std::string getName(){return name; } //inline method
-        void set_card_stack(Card card){
+        int stacksize()const; //inline method
+        int cardesTaken()const;// inline method
+        std::string getName()const;//inline method
+        
+        void set_card_stack(Card const &card){ //inline method
             cards.push(card);
-            ++cardsleft;} //inline method
+            ++cardsleft;
+        } 
+
         Card get_card(); //outline method
-        // void set_stacksize(){} //inline method
-        void set_cardsTaken(int i){cardstaken +=i;} //inline method
+        void set_cardsTaken(int value){cardstaken +=value;} //inline method
         void set_dec_stacksize(){--cardsleft;} //inline method
-        
-        
-        
+        void set_cards_won(const string &win_card){cards_won.push(win_card);}
+        void print_cards_won();
+
         // Constructors:
-        Player(); //outline constructor
-        Player(std::string pname);  // outline constructor
-        Player(Player &p); // outline constructor
+        Player();
+        Player(std::string pname);
+        Player(const Player& player); // copy constructor
+
+        // Destructor:
+        ~Player(){} 
+        Player& operator=(const Player& other);
+        Player(Player&& other) noexcept;
+        Player& operator=(Player&& other) noexcept;
     };
 };
